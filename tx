@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import sys
+import argparse
+
+from Bio.Seq import Seq
+
+# program options
+parser = argparse.ArgumentParser(description='Translate the given DNA/RNA sequence')
+# add group for outputting both sequences
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--both', '-b', action='store_true', help='output both the nucleotide followed by the amino acid sequence')
+group.add_argument('-B',           action='store_true', help='output both the amino acid followed by the nucleotide sequence')
+# pad the sequence to be a multiple of three
+parser.add_argument('--pad', '-p', metavar='c', nargs='?', const='N', help='pad the sequence to a multiple of three with the given character (default: no padding)')
+# input sources
+parser.add_argument('input_files', metavar='infile', nargs='*', type=argparse.FileType('r'), default=[argparse.FileType('r')('-')],
+        help='input files')
+args = parser.parse_args()
+
+for file_handle in args.input_files:
+    for line in file_handle:
+        line = line[:-1]
+        if line.startswith('>'):
+            print(line)
+        else:
+            s = Seq(line)
+            if args.pad:
+                s = s + args.pad * (-len(s) % 3)
+            if args.both:
+                print(s)
+                print(''.join(' ' + aa + ' ' for aa in s.translate()))
+            elif args.B:
+                print(''.join(' ' + aa + ' ' for aa in s.translate()))
+                print(s)
+            else:
+                print(s.translate())

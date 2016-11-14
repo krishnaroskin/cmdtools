@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import argparse
+import fileinput
+
+from Bio.Seq import Seq
+
+# program options
+parser = argparse.ArgumentParser(description='Reverse compliment the given DNA/RNA sequence',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+for line in fileinput.input():
+    if line.startswith('>'):
+        print line,
+    else:
+        s = Seq(line[:-1])
+        print s.reverse_complement()
